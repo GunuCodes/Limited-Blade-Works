@@ -3,16 +3,17 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
-  - 
+  - Attackable
+  - Player
   - 
   - 
   - 
@@ -40,4 +41,13 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1366284551
+    locked: 0
+  - name: Midground
+    uniqueID: 978239801
+    locked: 0
+  - name: Foreground
+    uniqueID: 2969391875
     locked: 0
