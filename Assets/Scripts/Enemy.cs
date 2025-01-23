@@ -34,7 +34,9 @@ public class Enemy : MonoBehaviour
 
         if(health <= 0)
         {
-            Destroy(gameObject);
+            StartCoroutine(DelayedDestroy());
+            enabled = false;  // Disable further updates
+            return;
         }
         if(isRecoiling)
         {
@@ -48,6 +50,12 @@ public class Enemy : MonoBehaviour
                 recoilTimer = 0;
             }
         }
+    }
+
+    protected virtual IEnumerator DelayedDestroy()
+    {
+        yield return new WaitForSeconds(2f);  // Adjust time as needed
+        Destroy(gameObject);
     }
 
     public virtual void EnemyHit(float _damageDone, Vector2 _hitDirection, float _hitForce)

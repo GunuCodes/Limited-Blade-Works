@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -98,6 +99,7 @@ public class UIManager : MonoBehaviour
             PlayerController.Instance.Health = PlayerController.Instance.maxHealth;
             PlayerController.Instance.pState.alive = true;
             PlayerController.Instance.pState.invincible = false;
+            PlayerController.Instance.pState.dying = false;
         }
 
         if (CheckpointManager.Instance != null)
@@ -105,10 +107,35 @@ public class UIManager : MonoBehaviour
             CheckpointManager.Instance.ClearAllCheckpoints();
         }
 
-        string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        yield return StartCoroutine(sceneFader.FadeAndLoadScene(
-            SceneFader.FadeDirection.In,
-            currentScene
-        ));
+        // Load Level_1 without fade in (screen stays black)
+        SceneManager.LoadScene("Level_1");
+        
+        // Wait a frame to ensure scene is loaded
+        yield return null;
+        
+        // Find the start point in the new scene
+        SceneTransition[] transitions = FindObjectsOfType<SceneTransition>();
+        Transform startPoint = null;
+        
+        foreach (var transition in transitions)
+        {
+            if (transition.GetStartPoint() != null)
+            {
+                startPoint = transition.GetStartPoint();
+                break;
+            }
+        }
+        
+        // Position player at start point
+        if (startPoint != null && PlayerController.Instance != null)
+        {
+            PlayerController.Instance.transform.position = startPoint.position;
+        }
+        
+        // Only fade out from black
+        if (sceneFader != null)
+        {
+            yield return StartCoroutine(sceneFader.Fade(SceneFader.FadeDirection.Out));
+        }
     }
 }

@@ -156,6 +156,14 @@ public class PlayerController : MonoBehaviour
 
         if (pState.cutscene) return;
 
+        if (pState.dying) 
+        {
+            // When dying, prevent any animation changes
+            anim.SetBool("isJumping", false);
+            anim.SetBool("isFalling", false);
+            return;
+        }
+
         if (pState.alive)
         {
             GetInputs();
@@ -287,6 +295,8 @@ public class PlayerController : MonoBehaviour
             // Reset heal timer when taking damage
             currentHealTimer = 0f;
             isHealing = false;
+            regeneratingHeartIndex = -1;
+            healProgress = 0f;
         }
     }
 
@@ -633,6 +643,8 @@ public class PlayerController : MonoBehaviour
     // Handles jump execution, coyote time, and variable jump height.
     void Jump()
     {
+        if (pState.dying) return;  // Prevent jump animations during death
+
         // Handle coyote time
         if (CheckGrounded())
         {
@@ -724,11 +736,32 @@ public class PlayerController : MonoBehaviour
         if (!pState.alive) yield break;  // Prevent multiple death coroutines
         
         pState.alive = false;
+        pState.dying = true;
         Time.timeScale = 1f;
-        anim.SetTrigger("Death");
         
-        // Disable player movement/input by zeroing velocity
+        // Immediately stop all horizontal movement
+        rb.velocity = new Vector2(0, rb.velocity.y);
+        
+        // Play death animation and lock it
+        anim.SetTrigger("Death");
+        anim.speed = 1;  // Ensure animation plays at normal speed
+        
+        // Add a timeout for waiting to hit the ground
+        float maxWaitTime = 0.5f;  // Maximum time to wait for ground contact
+        float waitTimer = 0f;
+        
+        // Wait until player hits the ground or timeout is reached
+        while (!CheckGrounded() && waitTimer < maxWaitTime)
+        {
+            // Only allow downward movement, cancel any upward velocity
+            rb.velocity = new Vector2(0, Mathf.Min(rb.velocity.y, 0));
+            waitTimer += Time.deltaTime;
+            yield return null;
+        }
+        
+        // Once grounded or timed out, freeze completely
         rb.velocity = Vector2.zero;
+        rb.constraints = RigidbodyConstraints2D.FreezeAll;
         
         yield return new WaitForSeconds(1f);
         StartCoroutine(UIManager.Instance.ActivateDeathScreen());
@@ -870,7 +903,15 @@ public class PlayerController : MonoBehaviour
         // Reset states
         isAttacking = false;
         isAirAttacking = false;
-        pState.invincible = false;  // Make sure invincibility is reset
+        pState.invincible = false;
+        pState.dying = false;
+        
+        // Reset rigidbody constraints
+        if (rb != null)
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+            rb.velocity = Vector2.zero;
+        }
         
         // Ensure proper layer and tag are set
         gameObject.layer = LayerMask.NameToLayer("Player");

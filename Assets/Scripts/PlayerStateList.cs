@@ -9,9 +9,11 @@ public class PlayerStateList : MonoBehaviour
     public bool invincible;
     public bool cutscene = false;
     public bool alive = true;
+    public bool dying = false;  // New state for death animation
 
     private void Awake()
     {
         alive = true;
+        dying = false;
     }
 }

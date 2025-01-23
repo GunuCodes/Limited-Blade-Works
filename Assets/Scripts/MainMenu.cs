@@ -6,7 +6,7 @@ using System.Collections;
 public class MainMenu : MonoBehaviour
 {
     [Header("Menu Settings")]
-    [SerializeField] private string firstLevelScene = "Level1"; // The scene to load when starting game
+    [SerializeField] private string firstLevelScene = "Level_1"; // The scene to load when starting game
     [SerializeField] private float fadeTime = 1f; // How long the fade transition takes
 
     [Header("UI References")]

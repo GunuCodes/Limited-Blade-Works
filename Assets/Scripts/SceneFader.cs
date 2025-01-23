@@ -53,10 +53,20 @@ public class SceneFader : MonoBehaviour
     public IEnumerator FadeAndLoadScene(FadeDirection _fadeDirection, string _sceneToLoad)
     {
         fadeOutUIImage.enabled = true;
-
-        yield return Fade(_fadeDirection);
+        
+        // If fading in, do the fade before loading scene
+        if (_fadeDirection == FadeDirection.In)
+        {
+            yield return Fade(_fadeDirection);
+        }
 
         SceneManager.LoadScene(_sceneToLoad);
+        
+        // If fading out, do the fade after loading scene
+        if (_fadeDirection == FadeDirection.Out)
+        {
+            yield return Fade(_fadeDirection);
+        }
     }
 
     void SetColorImage(ref float _alpha, FadeDirection _fadeDirection)

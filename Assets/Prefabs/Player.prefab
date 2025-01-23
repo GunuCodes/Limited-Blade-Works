@@ -227,8 +227,8 @@ MonoBehaviour:
   recoilDelay: 0.3
   pState: {fileID: 0}
   groundCheckPoint: {fileID: 8421677684404806195}
-  groundCheckY: 0.05
-  groundCheckX: 1
+  groundCheckY: 0.1
+  groundCheckX: 0.6
   whatIsGround:
     serializedVersion: 2
     m_Bits: 8

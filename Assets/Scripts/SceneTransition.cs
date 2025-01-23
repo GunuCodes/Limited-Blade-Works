@@ -136,4 +136,10 @@ public class SceneTransition : MonoBehaviour
             SceneManager.LoadScene(transitionTo);
         }
     }
+
+    // Add this method to access the start point
+    public Transform GetStartPoint()
+    {
+        return startPoint;
+    }
 }

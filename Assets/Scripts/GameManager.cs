@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,6 +13,11 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get; private set; }
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioClip levelMusic;
+    private bool isMusicPlaying = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -22,6 +28,32 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Initialize audio source if not set
+            if (musicSource == null)
+            {
+                musicSource = gameObject.AddComponent<AudioSource>();
+                musicSource.loop = true;
+                musicSource.playOnAwake = false;
+            }
+            
+            // Subscribe to scene loading events
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "Level_1" && !isMusicPlaying && levelMusic != null)
+        {
+            musicSource.clip = levelMusic;
+            musicSource.Play();
+            isMusicPlaying = true;
         }
     }
 
